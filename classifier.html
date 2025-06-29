@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Garbage Classifier</title>
+  <style>
+    :root {
+      --primary: #0a1f44;
+      --secondary: #3e8e63;
+      --light-bg: #f4f6f8;
+      --info-bg: #dff5e1;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background-color: var(--primary);
+      color: white;
+      padding: 15px 30px;
+      font-size: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .container {
+      background: var(--info-bg);
+      padding: 40px;
+      margin: 30px auto;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+      border: 2px solid var(--primary);
+      flex-grow: 1;
+    }
+
+    h2 {
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      padding: 10px;
+      margin: 15px 0;
+      border: 2px dashed var(--secondary);
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      background-color: #fff;
+    }
+
+    img {
+      max-width: 100%;
+      margin-top: 15px;
+      border-radius: 12px;
+      display: none;
+      border: 2px solid var(--secondary);
+    }
+
+    button {
+      background: var(--secondary);
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #2f704e;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .footer {
+      margin-top: 25px;
+      font-size: 13px;
+      color: #444;
+    }
+
+    .info {
+      text-align: left;
+      margin-top: 40px;
+      padding: 20px;
+      background: white;
+      border-left: 4px solid var(--secondary);
+      border-radius: 10px;
+    }
+
+    .info h3 {
+      color: var(--secondary);
+    }
+
+    .info ul {
+      padding-left: 20px;
+    }
+
+    .info li {
+      margin-bottom: 10px;
+    }
+
+    footer.main-footer {
+      background-color: var(--primary);
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <a href="index.html">⬅ Home</a>
+    <span>Garbage Classifier</span>
+  </div>
+
+  <div class="container">
+    <h2>🗑️ Garbage Classifier</h2>
+    <input type="file" id="imageInput" accept="image/*" />
+    <img id="preview" alt="Image Preview" />
+    <button onclick="predict()">🔍 Predict</button>
+    <div id="result"></div>
+    <div class="footer">Powered by MobileNetV2 | Styled by ToqaAsedah 🌿</div>
+
+    <div class="info">
+      <h3>📘 About Recycling</h3>
+      <ul>
+        <li>♻️ Recycling reduces pollution and landfill waste.</li>
+        <li>📦 Cardboard and paper can be reused in packaging.</li>
+        <li>🔋 Batteries contain chemicals and need safe disposal.</li>
+        <li>👚 Clothes can be donated or repurposed into fabric.</li>
+        <li>🔍 This model helps you classify waste items automatically.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer class="main-footer">
+    <p>© 2025 Recycle Smart | Designed by ToqaAsedah 🌿</p>
+  </footer>
+
+  <script>
+    const imageInput = document.getElementById("imageInput");
+    const preview = document.getElementById("preview");
+
+    imageInput.addEventListener("change", () => {
+      const file = imageInput.files[0];
+      if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+      }
+    });
+
+    async function predict() {
+      const file = imageInput.files[0];
+      if (!file) {
+        alert("Please select an image.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        body: formData
+      });
+
+      const result = await response.json();
+      document.getElementById("result").innerText =
+        `Predicted Class: ${result.class}\nConfidence: ${result.confidence.toFixed(2)}%`;
+    }
+  </script>
+
+</body>
+</html>
+
